@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alarm Man</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="stage">
+    <header class="header">
+      <h1>Alarm Man</h1>
+      <p>Click him to ring the alarm!</p>
+    </header>
+
+    <button id="alarmMan" class="alarm-man" type="button" aria-label="Ring Alarm Man">
+      <!-- Left bell -->
+      <span class="bell bell-left" aria-hidden="true"></span>
+      <!-- Right bell -->
+      <span class="bell bell-right" aria-hidden="true"></span>
+      <!-- Hammer -->
+      <span class="hammer" aria-hidden="true"></span>
+
+      <!-- Head / clock body -->
+      <span class="clock-body" aria-hidden="true">
+        <span class="face">
+          <span class="eye eye-left"></span>
+          <span class="eye eye-right"></span>
+          <span class="mouth"></span>
+          <span class="hand hour"></span>
+          <span class="hand minute"></span>
+          <span class="center-dot"></span>
+        </span>
+      </span>
+
+      <!-- Arms -->
+      <span class="arm arm-left" aria-hidden="true">
+        <span class="hand-shape"></span>
+      </span>
+      <span class="arm arm-right" aria-hidden="true">
+        <span class="hand-shape"></span>
+      </span>
+
+      <!-- Legs -->
+      <span class="leg leg-left" aria-hidden="true">
+        <span class="foot"></span>
+      </span>
+      <span class="leg leg-right" aria-hidden="true">
+        <span class="foot"></span>
+      </span>
+    </button>
+
+    <div class="controls">
+      <button id="ringBtn" class="btn" type="button">Ring!</button>
+      <button id="snoozeBtn" class="btn btn-secondary" type="button">Snooze</button>
+    </div>
+
+    <p id="status" class="status" aria-live="polite">zzz… sleeping</p>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
