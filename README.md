@@ -1,19 +1,24 @@
-# Alarm Man
+# Alarm Man & Screen Trap
 
-An interactive anthropomorphic alarm clock character.
+Interactive characters on one page:
+
+1. **Alarm Man** — anthropomorphic alarm clock that rings
+2. **Screen Trap** — bear trap that snaps and closes metal jaws over the whole display
 
 ## Run
-
-Open `index.html` in a browser, or serve the folder:
 
 ```bash
 python3 -m http.server 8000
 ```
 
-Then visit http://localhost:8000
+Visit http://localhost:8000
 
 ## Controls
 
-- Click **Alarm Man** to toggle ringing
-- **Ring!** starts the alarm
-- **Snooze** stops it
+### Alarm Man
+- Click the character to toggle ringing
+- **Ring!** / **Snooze**
+
+### Screen Trap
+- Click the trap or **SNAP!** — jaws slam shut over the screen with a **GOTCHA!**
+- Click the overlay or **Reset** to open the trap again
