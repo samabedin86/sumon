@@ -6,7 +6,19 @@ Interactive page with toys **and** a real multi-task agent:
 2. **Screen Trap** — jaws snap over the display (play)
 3. **Agent Sumon** — persistent assistant for everyday work
 
-## Run
+## Single-file build
+
+Everything is also saved as one self-contained file:
+
+```bash
+# open the all-in-one page
+python3 -m http.server 8000
+# then visit http://localhost:8000/sam%20ai.html
+```
+
+File: **`sam ai.html`** — HTML + CSS + JS bundled (Alarm Man, Screen Trap, Sam AI agent).
+
+## Run (multi-file)
 
 ```bash
 python3 -m http.server 8000
