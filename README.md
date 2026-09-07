@@ -1,9 +1,6 @@
-# Alarm Man & Screen Trap
+# Sam AI — roaming companion
 
-Interactive characters on one page:
-
-1. **Alarm Man** — anthropomorphic alarm clock that rings
-2. **Screen Trap** — bear trap that snaps and closes metal jaws over the whole display
+Sam AI is a character that **moves around the display**. Click or drag to chat. No full-page layout.
 
 ## Run
 
@@ -11,14 +8,13 @@ Interactive characters on one page:
 python3 -m http.server 8000
 ```
 
-Visit http://localhost:8000
+- Multi-file: http://localhost:8000  
+- Single file: http://localhost:8000/sam%20ai.html
 
 ## Controls
 
-### Alarm Man
-- Click the character to toggle ringing
-- **Ring!** / **Snooze**
-
-### Screen Trap
-- Click the trap or **SNAP!** — jaws slam shut over the screen with a **GOTCHA!**
-- Click the overlay or **Reset** to open the trap again
+- **Wander** — Sam AI walks the screen on their own
+- **Click** — open chat
+- **Drag** — place them anywhere
+- **Chat / Mic** — talk, learn, act (todos, focus, prefer, profile…)
+- Say `ring` / `snap` for the hidden play toys
