@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sam AI — Talks, Learns & Acts</title>
+  <title>Sam AI — Roaming Companion</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
@@ -41,8 +41,266 @@ body {
     radial-gradient(circle at 80% 80%, rgba(255, 107, 107, 0.2), transparent 45%),
     radial-gradient(circle at 70% 30%, rgba(94, 234, 212, 0.12), transparent 42%),
     linear-gradient(160deg, var(--bg-top), var(--bg-bottom));
-  overflow-x: hidden;
+  overflow: hidden;
 }
+
+body.roam-world {
+  display: block;
+  place-items: unset;
+}
+
+.offstage {
+  position: fixed;
+  left: -9999px;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.sky {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.drift {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: 0.45;
+  animation: drift-float 18s ease-in-out infinite;
+}
+
+.drift-a {
+  width: 42vw;
+  height: 42vw;
+  left: -8%;
+  top: 10%;
+  background: rgba(94, 234, 212, 0.22);
+}
+
+.drift-b {
+  width: 36vw;
+  height: 36vw;
+  right: -6%;
+  bottom: 8%;
+  background: rgba(255, 107, 107, 0.18);
+  animation-delay: -6s;
+}
+
+.drift-c {
+  width: 28vw;
+  height: 28vw;
+  left: 40%;
+  top: 55%;
+  background: rgba(255, 230, 109, 0.12);
+  animation-delay: -11s;
+}
+
+@keyframes drift-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(3%, -4%) scale(1.08); }
+}
+
+.roam-hint {
+  position: fixed;
+  top: max(1rem, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  margin: 0;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  background: rgba(12, 20, 28, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 0.88rem;
+  opacity: 0.9;
+  pointer-events: none;
+  transition: opacity 0.8s ease;
+  text-align: center;
+  max-width: min(92vw, 420px);
+}
+
+.roam-hint.fade {
+  opacity: 0;
+}
+
+/* ===== Roaming Sam AI ===== */
+.sam-roamer {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 30;
+  width: 112px;
+  height: 112px;
+  border: none;
+  background: transparent;
+  cursor: grab;
+  padding: 0;
+  touch-action: none;
+  will-change: transform;
+}
+
+.sam-roamer:active,
+.sam-roamer.dragging {
+  cursor: grabbing;
+}
+
+.sam-roamer.dragging .sam-body {
+  transform: scale(1.08);
+}
+
+.sam-body {
+  position: absolute;
+  inset: 8px 8px 22px;
+  transition: transform 0.15s ease;
+}
+
+.sam-roamer .agent-aura {
+  inset: 0;
+}
+
+.sam-roamer .agent-core {
+  inset: 18%;
+}
+
+.sam-roamer .agent-antenna {
+  top: -2%;
+}
+
+.sam-shadow {
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  bottom: 6px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.28);
+  filter: blur(3px);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.sam-roamer.moving .sam-shadow {
+  animation: shadow-bob 0.35s ease-in-out infinite alternate;
+}
+
+.sam-roamer.moving .sam-body {
+  animation: body-bob 0.35s ease-in-out infinite alternate;
+}
+
+.sam-leg {
+  position: absolute;
+  bottom: -6px;
+  width: 8px;
+  height: 16px;
+  background: var(--agent-deep);
+  border-radius: 4px;
+}
+
+.sam-leg-l { left: 32%; }
+.sam-leg-r { right: 32%; }
+
+.sam-roamer.moving .sam-leg-l {
+  animation: leg-l 0.28s ease-in-out infinite alternate;
+}
+
+.sam-roamer.moving .sam-leg-r {
+  animation: leg-r 0.28s ease-in-out infinite alternate;
+}
+
+.sam-roamer.face-left .sam-body {
+  transform: scaleX(-1);
+}
+
+.sam-roamer.face-left.moving .sam-body {
+  animation: body-bob-flip 0.35s ease-in-out infinite alternate;
+}
+
+.sam-name {
+  position: absolute;
+  left: 50%;
+  bottom: -2px;
+  transform: translateX(-50%);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--agent);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.sam-bubble {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 6px);
+  transform: translateX(-50%);
+  min-width: 72px;
+  max-width: 160px;
+  padding: 0.4rem 0.65rem;
+  border-radius: 12px;
+  background: rgba(18, 12, 36, 0.92);
+  border: 1px solid rgba(94, 234, 212, 0.4);
+  color: var(--text);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.25;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: bubble-in 0.25s ease;
+}
+
+.sam-bubble::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  width: 10px;
+  height: 10px;
+  margin-left: -5px;
+  background: rgba(18, 12, 36, 0.92);
+  border-right: 1px solid rgba(94, 234, 212, 0.4);
+  border-bottom: 1px solid rgba(94, 234, 212, 0.4);
+  transform: rotate(45deg);
+}
+
+.sam-roamer.listening .agent-aura {
+  animation-duration: 1.2s;
+}
+
+.sam-roamer.thinking .agent-core {
+  animation: agent-think 0.55s ease-in-out infinite alternate;
+}
+
+@keyframes body-bob {
+  from { transform: translateY(0); }
+  to { transform: translateY(-5px); }
+}
+
+@keyframes body-bob-flip {
+  from { transform: scaleX(-1) translateY(0); }
+  to { transform: scaleX(-1) translateY(-5px); }
+}
+
+@keyframes shadow-bob {
+  from { transform: scaleX(1); opacity: 0.35; }
+  to { transform: scaleX(0.85); opacity: 0.22; }
+}
+
+@keyframes leg-l {
+  from { transform: rotate(-18deg); }
+  to { transform: rotate(16deg); }
+}
+
+@keyframes leg-r {
+  from { transform: rotate(16deg); }
+  to { transform: rotate(-18deg); }
+}
+
 
 .header h1,
 .agent-panel-header h2 {
@@ -1196,8 +1454,46 @@ body {
 
   </style>
 </head>
-<body>
-  <!-- Full-screen trap jaws overlay -->
+<body class="roam-world">
+  <!-- Atmosphere only — no full-page stages -->
+  <div class="sky" aria-hidden="true">
+    <span class="drift drift-a"></span>
+    <span class="drift drift-b"></span>
+    <span class="drift drift-c"></span>
+  </div>
+
+  <p class="roam-hint" id="roamHint">Sam AI wanders the display — click or drag the character to chat</p>
+
+  <!-- Hidden toys kept for agent commands (ring / snap) -->
+  <div class="offstage" aria-hidden="true">
+    <button id="alarmMan" class="alarm-man" type="button" tabindex="-1">
+      <span class="bell bell-left"></span><span class="bell bell-right"></span>
+      <span class="hammer"></span>
+      <span class="clock-body"><span class="face">
+        <span class="eye eye-left"></span><span class="eye eye-right"></span>
+        <span class="mouth"></span><span class="hand hour"></span><span class="hand minute"></span>
+        <span class="center-dot"></span>
+      </span></span>
+      <span class="arm arm-left"><span class="hand-shape"></span></span>
+      <span class="arm arm-right"><span class="hand-shape"></span></span>
+      <span class="leg leg-left"><span class="foot"></span></span>
+      <span class="leg leg-right"><span class="foot"></span></span>
+    </button>
+    <button id="ringBtn" type="button"></button>
+    <button id="snoozeBtn" type="button"></button>
+    <p id="status"></p>
+
+    <button id="bearTrap" class="bear-trap set" type="button" tabindex="-1">
+      <span class="bt-base"></span><span class="bt-spring"></span><span class="bt-plate"></span>
+      <span class="bt-jaw bt-jaw-left"><span class="bt-tooth"></span><span class="bt-tooth"></span><span class="bt-tooth"></span><span class="bt-tooth"></span><span class="bt-tooth"></span></span>
+      <span class="bt-jaw bt-jaw-right"><span class="bt-tooth"></span><span class="bt-tooth"></span><span class="bt-tooth"></span><span class="bt-tooth"></span><span class="bt-tooth"></span></span>
+      <span class="bt-bait">🧀</span>
+    </button>
+    <button id="snapBtn" type="button"></button>
+    <button id="resetTrapBtn" type="button"></button>
+    <p id="trapStatus"></p>
+  </div>
+
   <div id="screenTrap" class="screen-trap" aria-hidden="true">
     <div class="trap-jaw trap-jaw-top">
       <span class="tooth"></span><span class="tooth"></span><span class="tooth"></span>
@@ -1215,122 +1511,42 @@ body {
     <p class="trap-gotcha">GOTCHA!</p>
   </div>
 
-  <main class="page">
-    <section class="stage">
-      <header class="header">
-        <h1>Alarm Man</h1>
-        <p>Click him to ring the alarm!</p>
-      </header>
+  <!-- Roaming Sam AI character -->
+  <button id="samRoamer" class="sam-roamer" type="button" aria-label="Sam AI — click to chat, drag to move">
+    <span class="sam-shadow" aria-hidden="true"></span>
+    <span class="sam-body" aria-hidden="true">
+      <span class="agent-aura"></span>
+      <span class="agent-core">
+        <span class="agent-eye agent-eye-left"></span>
+        <span class="agent-eye agent-eye-right"></span>
+        <span class="agent-mouth"></span>
+      </span>
+      <span class="agent-antenna"></span>
+      <span class="sam-leg sam-leg-l"></span>
+      <span class="sam-leg sam-leg-r"></span>
+    </span>
+    <span class="sam-name">Sam AI</span>
+    <span id="samBubble" class="sam-bubble" hidden></span>
+  </button>
 
-      <button id="alarmMan" class="alarm-man" type="button" aria-label="Ring Alarm Man">
-        <span class="bell bell-left" aria-hidden="true"></span>
-        <span class="bell bell-right" aria-hidden="true"></span>
-        <span class="hammer" aria-hidden="true"></span>
-
-        <span class="clock-body" aria-hidden="true">
-          <span class="face">
-            <span class="eye eye-left"></span>
-            <span class="eye eye-right"></span>
-            <span class="mouth"></span>
-            <span class="hand hour"></span>
-            <span class="hand minute"></span>
-            <span class="center-dot"></span>
-          </span>
-        </span>
-
-        <span class="arm arm-left" aria-hidden="true">
-          <span class="hand-shape"></span>
-        </span>
-        <span class="arm arm-right" aria-hidden="true">
-          <span class="hand-shape"></span>
-        </span>
-
-        <span class="leg leg-left" aria-hidden="true">
-          <span class="foot"></span>
-        </span>
-        <span class="leg leg-right" aria-hidden="true">
-          <span class="foot"></span>
-        </span>
-      </button>
-
-      <div class="controls">
-        <button id="ringBtn" class="btn" type="button">Ring!</button>
-        <button id="snoozeBtn" class="btn btn-secondary" type="button">Snooze</button>
-      </div>
-
-      <p id="status" class="status" aria-live="polite">zzz… sleeping</p>
-    </section>
-
-    <section class="stage trap-stage">
-      <header class="header">
-        <h1>Screen Trap</h1>
-        <p>Click the trap — jaws snap shut on the display!</p>
-      </header>
-
-      <button id="bearTrap" class="bear-trap" type="button" aria-label="Spring the trap">
-        <span class="bt-base" aria-hidden="true"></span>
-        <span class="bt-spring" aria-hidden="true"></span>
-        <span class="bt-plate" aria-hidden="true"></span>
-        <span class="bt-jaw bt-jaw-left" aria-hidden="true">
-          <span class="bt-tooth"></span><span class="bt-tooth"></span>
-          <span class="bt-tooth"></span><span class="bt-tooth"></span>
-          <span class="bt-tooth"></span>
-        </span>
-        <span class="bt-jaw bt-jaw-right" aria-hidden="true">
-          <span class="bt-tooth"></span><span class="bt-tooth"></span>
-          <span class="bt-tooth"></span><span class="bt-tooth"></span>
-          <span class="bt-tooth"></span>
-        </span>
-        <span class="bt-bait" aria-hidden="true">🧀</span>
-      </button>
-
-      <div class="controls">
-        <button id="snapBtn" class="btn btn-danger" type="button">SNAP!</button>
-        <button id="resetTrapBtn" class="btn btn-secondary" type="button">Reset</button>
-      </div>
-
-      <p id="trapStatus" class="status" aria-live="polite">Trap is set… waiting…</p>
-    </section>
-
-    <section class="stage agent-stage">
-      <header class="header">
-        <h1>Sam AI</h1>
-        <p>Talks with you (text + voice), learns habits, and acts. Toys stay as extras.</p>
-      </header>
-
-      <button id="agentFigure" class="agent-figure" type="button" aria-label="Open Sam AI">
-        <span class="agent-aura" aria-hidden="true"></span>
-        <span class="agent-core" aria-hidden="true">
-          <span class="agent-eye agent-eye-left"></span>
-          <span class="agent-eye agent-eye-right"></span>
-          <span class="agent-mouth"></span>
-        </span>
-        <span class="agent-antenna" aria-hidden="true"></span>
-      </button>
-
-      <ul id="missionBoard" class="mission-board" aria-live="polite"></ul>
-
-      <div class="controls">
-        <button id="openAgentBtn" class="btn" type="button">Chat</button>
-        <button id="clearAgentMemoryBtn" class="btn btn-secondary" type="button">Clear memory</button>
-      </div>
-
-      <p id="agentStatus" class="status" aria-live="polite">Multi-task agent on standby</p>
-    </section>
-  </main>
+  <!-- Keep ids agent code expects -->
+  <button id="agentFigure" class="visually-hidden" type="button" tabindex="-1" aria-hidden="true"></button>
+  <ul id="missionBoard" class="visually-hidden" aria-hidden="true"></ul>
+  <button id="openAgentBtn" class="visually-hidden" type="button" tabindex="-1" aria-hidden="true"></button>
+  <button id="clearAgentMemoryBtn" class="visually-hidden" type="button" tabindex="-1" aria-hidden="true"></button>
+  <p id="agentStatus" class="visually-hidden" aria-live="polite"></p>
 
   <div id="focusHud" class="focus-hud" aria-live="polite"></div>
 
-  <!-- Persistent floating chat (always available) -->
-  <button id="agentLauncher" class="agent-launcher" type="button" aria-label="Open persistent assistant" aria-expanded="false" aria-controls="agentPanel">
+  <button id="agentLauncher" class="agent-launcher" type="button" aria-label="Open Sam AI chat" aria-expanded="false" aria-controls="agentPanel">
     <span class="launcher-orb" aria-hidden="true"></span>
-    <span class="launcher-label">Sam AI</span>
+    <span class="launcher-label">Chat</span>
   </button>
 
   <aside id="agentPanel" class="agent-panel" aria-hidden="true" aria-label="Sam AI chat">
     <header class="agent-panel-header">
       <div>
-        <p class="agent-panel-kicker">Talks · learns · acts</p>
+        <p class="agent-panel-kicker">Roaming companion</p>
         <h2>Sam AI</h2>
       </div>
       <button id="agentClose" class="agent-close" type="button" aria-label="Close chat">×</button>
@@ -1345,7 +1561,7 @@ body {
       <button type="button" class="agent-chip" data-prompt="help">Help</button>
     </div>
     <form id="agentForm" class="agent-form">
-      <button id="agentMic" class="agent-mic" type="button" aria-label="Speak to agent" aria-pressed="false" title="Hold a conversation — click to talk">Mic</button>
+      <button id="agentMic" class="agent-mic" type="button" aria-label="Speak to Sam AI" aria-pressed="false" title="Click to talk">Mic</button>
       <label class="visually-hidden" for="agentInput">Message Sam AI</label>
       <input id="agentInput" type="text" autocomplete="off" placeholder="Chat freely · or prefer / act / learn" maxlength="280" />
       <button type="submit" class="btn">Send</button>
@@ -1532,6 +1748,7 @@ body {
   const input = document.getElementById("agentInput");
   const messagesEl = document.getElementById("agentMessages");
   const agentFigure = document.getElementById("agentFigure");
+  const samRoamer = document.getElementById("samRoamer");
   const agentStatus = document.getElementById("agentStatus");
   const openChatBtn = document.getElementById("openAgentBtn");
   const clearMemoryBtn = document.getElementById("clearAgentMemoryBtn");
@@ -1539,6 +1756,10 @@ body {
   const focusHud = document.getElementById("focusHud");
   const focusChip = document.getElementById("focusChip");
 
+  function setCharacterClass(name, on) {
+    if (agentFigure) agentFigure.classList.toggle(name, on);
+    if (samRoamer) samRoamer.classList.toggle(name, on);
+  }
   const IDEAS = [
     "Ship one tiny win before lunch.",
     "Text someone you appreciate — 20 seconds.",
@@ -1583,7 +1804,7 @@ body {
     messages: [
       {
         role: "agent",
-        text: "Agent Sumon here — I learn, act, and communicate. Type, tap a chip, or use the mic. Say talk on if you want me to speak out loud.",
+        text: "Sam AI here — I roam your display. Click or drag me, chat, use the mic. I learn, act, and talk.",
       },
     ],
   });
@@ -1713,7 +1934,7 @@ body {
       mic.setAttribute("aria-pressed", "true");
     }
     agentStatus.textContent = "Listening… speak now";
-    agentFigure.classList.add("listening");
+    setCharacterClass("listening", true);
 
     recognition.onresult = (event) => {
       const said = event.results[0] && event.results[0][0] && event.results[0][0].transcript;
@@ -1939,14 +2160,17 @@ body {
     launcher.setAttribute("aria-expanded", open ? "true" : "false");
     if (open) {
       input.focus();
-      agentFigure.classList.add("listening");
+      setCharacterClass("listening", true);
       agentStatus.textContent = "Learning & acting";
       maybeProactiveOpen();
+      if (window.SamRoam) window.SamRoam.pause(true);
     } else {
-      agentFigure.classList.remove("listening", "thinking");
+      setCharacterClass("listening", false);
+      setCharacterClass("thinking", false);
       agentStatus.textContent = state.userName
         ? `${state.userName}'s agent on standby`
         : "Learning agent on standby";
+      if (window.SamRoam) window.SamRoam.pause(false);
     }
   }
 
@@ -1968,7 +2192,7 @@ body {
   }
 
   function thinkPulse(on) {
-    agentFigure.classList.toggle("thinking", on);
+    setCharacterClass("thinking", on);
   }
 
   function pageApi() {
@@ -2655,7 +2879,7 @@ body {
     }
 
     if (/\b(who are you|what are you)\b/.test(lower)) {
-      return "Agent Sumon — I talk with you (text + voice), learn your habits, and act on them.";
+      return "Sam AI — I roam your screen, talk with you, learn habits, and act.";
     }
 
     return converse(text, lower);
@@ -2671,11 +2895,14 @@ body {
     window.setTimeout(() => {
       const reply = replyFor(trimmed);
       thinkPulse(false);
-      agentFigure.classList.add("listening");
+      setCharacterClass("listening", true);
       agentStatus.textContent = "Learning & communicating";
       if (reply != null) {
         pushMessage("agent", reply);
         speak(reply);
+        if (window.SamRoam && window.SamRoam.say) {
+          window.SamRoam.say(String(reply).split("\n")[0].slice(0, 42), 1800);
+        }
       }
     }, 160);
   }
@@ -2727,6 +2954,186 @@ body {
   agentStatus.textContent = state.userName
     ? `Welcome back, ${state.userName}`
     : "Learning agent on standby";
+})();
+
+  </script>
+  <script>
+(() => {
+  const roamer = document.getElementById("samRoamer");
+  const bubble = document.getElementById("samBubble");
+  const hint = document.getElementById("roamHint");
+  const panel = document.getElementById("agentPanel");
+  if (!roamer) return;
+
+  const SIZE = 112;
+  let x = Math.random() * Math.max(40, window.innerWidth - SIZE - 40) + 20;
+  let y = Math.random() * Math.max(40, window.innerHeight - SIZE - 120) + 40;
+  let vx = (Math.random() * 0.7 + 0.35) * (Math.random() < 0.5 ? -1 : 1);
+  let vy = (Math.random() * 0.55 + 0.25) * (Math.random() < 0.5 ? -1 : 1);
+  let paused = false;
+  let dragging = false;
+  let dragDx = 0;
+  let dragDy = 0;
+  let moved = false;
+  let lastBubble = 0;
+  let raf = 0;
+
+  const lines = [
+    "Hey — tap me!",
+    "I wander & listen.",
+    "Got a task?",
+    "Say act…",
+    "Drag me around!",
+    "Mic works too.",
+  ];
+
+  function bounds() {
+    return {
+      maxX: Math.max(8, window.innerWidth - SIZE - 8),
+      maxY: Math.max(8, window.innerHeight - SIZE - 72),
+    };
+  }
+
+  function apply() {
+    roamer.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+    roamer.classList.toggle("face-left", vx < 0);
+    roamer.classList.toggle("moving", !paused && !dragging && (Math.abs(vx) > 0.05 || Math.abs(vy) > 0.05));
+  }
+
+  function showBubble(text, ms = 2200) {
+    if (!bubble) return;
+    bubble.hidden = false;
+    bubble.textContent = text;
+    window.clearTimeout(showBubble._t);
+    showBubble._t = window.setTimeout(() => {
+      bubble.hidden = true;
+    }, ms);
+  }
+
+  function tick() {
+    if (!paused && !dragging) {
+      const { maxX, maxY } = bounds();
+      x += vx;
+      y += vy;
+      if (x <= 8) {
+        x = 8;
+        vx = Math.abs(vx);
+      } else if (x >= maxX) {
+        x = maxX;
+        vx = -Math.abs(vx);
+      }
+      if (y <= 8) {
+        y = 8;
+        vy = Math.abs(vy);
+      } else if (y >= maxY) {
+        y = maxY;
+        vy = -Math.abs(vy);
+      }
+      // gentle wander drift
+      if (Math.random() < 0.008) {
+        vx += (Math.random() - 0.5) * 0.35;
+        vy += (Math.random() - 0.5) * 0.35;
+        const sp = Math.hypot(vx, vy) || 1;
+        const target = 0.55 + Math.random() * 0.45;
+        vx = (vx / sp) * target;
+        vy = (vy / sp) * target;
+      }
+      if (Date.now() - lastBubble > 12000 && Math.random() < 0.004) {
+        lastBubble = Date.now();
+        showBubble(lines[Math.floor(Math.random() * lines.length)]);
+      }
+    }
+    apply();
+    raf = requestAnimationFrame(tick);
+  }
+
+  function pauseWander(on) {
+    paused = on;
+    roamer.classList.toggle("paused", on);
+  }
+
+  // Sync pause when chat opens/closes
+  const mo = new MutationObserver(() => {
+    const open = panel && panel.classList.contains("open");
+    pauseWander(open);
+    if (open) showBubble("Listening…", 1600);
+  });
+  if (panel) mo.observe(panel, { attributes: true, attributeFilter: ["class"] });
+
+  function pointerDown(e) {
+    if (e.button != null && e.button !== 0) return;
+    dragging = true;
+    moved = false;
+    pauseWander(true);
+    const pt = e.touches ? e.touches[0] : e;
+    dragDx = pt.clientX - x;
+    dragDy = pt.clientY - y;
+    roamer.classList.add("dragging");
+    e.preventDefault();
+  }
+
+  function pointerMove(e) {
+    if (!dragging) return;
+    const pt = e.touches ? e.touches[0] : e;
+    const { maxX, maxY } = bounds();
+    const nx = pt.clientX - dragDx;
+    const ny = pt.clientY - dragDy;
+    if (Math.hypot(nx - x, ny - y) > 4) moved = true;
+    x = Math.min(maxX, Math.max(8, nx));
+    y = Math.min(maxY, Math.max(8, ny));
+    apply();
+  }
+
+  function pointerUp() {
+    if (!dragging) return;
+    dragging = false;
+    roamer.classList.remove("dragging");
+    const open = panel && panel.classList.contains("open");
+    if (!moved) {
+      // click → open chat via launcher/agent API
+      const launch = document.getElementById("agentLauncher");
+      if (launch) launch.click();
+      showBubble("Hi!", 1200);
+    } else if (!open) {
+      pauseWander(false);
+      // give a nudge in a random direction after drag
+      vx = (Math.random() * 0.7 + 0.3) * (Math.random() < 0.5 ? -1 : 1);
+      vy = (Math.random() * 0.55 + 0.25) * (Math.random() < 0.5 ? -1 : 1);
+    }
+  }
+
+  roamer.addEventListener("mousedown", pointerDown);
+  roamer.addEventListener("touchstart", pointerDown, { passive: false });
+  window.addEventListener("mousemove", pointerMove);
+  window.addEventListener("touchmove", pointerMove, { passive: false });
+  window.addEventListener("mouseup", pointerUp);
+  window.addEventListener("touchend", pointerUp);
+
+  window.addEventListener("resize", () => {
+    const { maxX, maxY } = bounds();
+    x = Math.min(x, maxX);
+    y = Math.min(y, maxY);
+    apply();
+  });
+
+  if (hint) {
+    window.setTimeout(() => hint.classList.add("fade"), 5000);
+  }
+
+  // Expose for agent / debugging
+  window.SamRoam = {
+    pause: pauseWander,
+    say: showBubble,
+    goTo(nx, ny) {
+      const { maxX, maxY } = bounds();
+      x = Math.min(maxX, Math.max(8, nx));
+      y = Math.min(maxY, Math.max(8, ny));
+      apply();
+    },
+  };
+
+  apply();
+  raf = requestAnimationFrame(tick);
 })();
 
   </script>

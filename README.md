@@ -1,54 +1,20 @@
-# Agent Sumon — creative persistent assistant
+# Sam AI — roaming companion
 
-Interactive page with toys **and** a real multi-task agent:
+Sam AI is a character that **moves around the display**. Click or drag to chat. No full-page layout.
 
-1. **Alarm Man** — anthropomorphic alarm clock (play)
-2. **Screen Trap** — jaws snap over the display (play)
-3. **Agent Sumon** — persistent assistant for everyday work
-
-## Single-file build
-
-Everything is also saved as one self-contained file:
-
-```bash
-# open the all-in-one page
-python3 -m http.server 8000
-# then visit http://localhost:8000/sam%20ai.html
-```
-
-File: **`sam ai.html`** — HTML + CSS + JS bundled (Alarm Man, Screen Trap, Sam AI agent).
-
-## Run (multi-file)
+## Run
 
 ```bash
 python3 -m http.server 8000
 ```
 
-Visit http://localhost:8000
+- Multi-file: http://localhost:8000  
+- Single file: http://localhost:8000/sam%20ai.html
 
-## Agent skills
+## Controls
 
-| Say / tap | What it does |
-|-----------|----------------|
-| `brief` | Day snapshot + learned insights |
-| `todo buy milk` | Add a task (persists) |
-| `note call mom` | Save a note |
-| `remind stretch in 5m` | Timed nudge |
-| `focus` / `focus 25` | Focus timer (learns your usual length) |
-| `prefer tea` / `prefer focus 15` | Teach a preference |
-| `learn I work nights` | Store a habit/fact |
-| `profile` | Show what it has learned |
-| `act` | Agent picks & runs the next best action |
-| `talk on` / `talk off` | Speak replies out loud |
-| **Mic** button | Voice in — agent listens and replies |
-| Free chat | Natural conversation (questions, feelings, jokes) |
-
-The agent tracks skill usage, focus habits, decision wins, and facts in `localStorage`, then **acts** (start focus, remind, breathe) from those patterns.
-
-## Toy controls
-
-### Alarm Man
-- Click to toggle ringing · **Ring!** / **Snooze**
-
-### Screen Trap
-- **SNAP!** closes jaws · click overlay or **Reset** to open
+- **Wander** — Sam AI walks the screen on their own
+- **Click** — open chat
+- **Drag** — place them anywhere
+- **Chat / Mic** — talk, learn, act (todos, focus, prefer, profile…)
+- Say `ring` / `snap` for the hidden play toys

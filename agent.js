@@ -8,6 +8,7 @@
   const input = document.getElementById("agentInput");
   const messagesEl = document.getElementById("agentMessages");
   const agentFigure = document.getElementById("agentFigure");
+  const samRoamer = document.getElementById("samRoamer");
   const agentStatus = document.getElementById("agentStatus");
   const openChatBtn = document.getElementById("openAgentBtn");
   const clearMemoryBtn = document.getElementById("clearAgentMemoryBtn");
@@ -15,6 +16,10 @@
   const focusHud = document.getElementById("focusHud");
   const focusChip = document.getElementById("focusChip");
 
+  function setCharacterClass(name, on) {
+    if (agentFigure) agentFigure.classList.toggle(name, on);
+    if (samRoamer) samRoamer.classList.toggle(name, on);
+  }
   const IDEAS = [
     "Ship one tiny win before lunch.",
     "Text someone you appreciate — 20 seconds.",
@@ -59,7 +64,7 @@
     messages: [
       {
         role: "agent",
-        text: "Agent Sumon here — I learn, act, and communicate. Type, tap a chip, or use the mic. Say talk on if you want me to speak out loud.",
+        text: "Sam AI here — I roam your display. Click or drag me, chat, use the mic. I learn, act, and talk.",
       },
     ],
   });
@@ -189,7 +194,7 @@
       mic.setAttribute("aria-pressed", "true");
     }
     agentStatus.textContent = "Listening… speak now";
-    agentFigure.classList.add("listening");
+    setCharacterClass("listening", true);
 
     recognition.onresult = (event) => {
       const said = event.results[0] && event.results[0][0] && event.results[0][0].transcript;
@@ -415,14 +420,17 @@
     launcher.setAttribute("aria-expanded", open ? "true" : "false");
     if (open) {
       input.focus();
-      agentFigure.classList.add("listening");
+      setCharacterClass("listening", true);
       agentStatus.textContent = "Learning & acting";
       maybeProactiveOpen();
+      if (window.SamRoam) window.SamRoam.pause(true);
     } else {
-      agentFigure.classList.remove("listening", "thinking");
+      setCharacterClass("listening", false);
+      setCharacterClass("thinking", false);
       agentStatus.textContent = state.userName
         ? `${state.userName}'s agent on standby`
         : "Learning agent on standby";
+      if (window.SamRoam) window.SamRoam.pause(false);
     }
   }
 
@@ -444,7 +452,7 @@
   }
 
   function thinkPulse(on) {
-    agentFigure.classList.toggle("thinking", on);
+    setCharacterClass("thinking", on);
   }
 
   function pageApi() {
@@ -1131,7 +1139,7 @@
     }
 
     if (/\b(who are you|what are you)\b/.test(lower)) {
-      return "Agent Sumon — I talk with you (text + voice), learn your habits, and act on them.";
+      return "Sam AI — I roam your screen, talk with you, learn habits, and act.";
     }
 
     return converse(text, lower);
@@ -1147,11 +1155,14 @@
     window.setTimeout(() => {
       const reply = replyFor(trimmed);
       thinkPulse(false);
-      agentFigure.classList.add("listening");
+      setCharacterClass("listening", true);
       agentStatus.textContent = "Learning & communicating";
       if (reply != null) {
         pushMessage("agent", reply);
         speak(reply);
+        if (window.SamRoam && window.SamRoam.say) {
+          window.SamRoam.say(String(reply).split("\n")[0].slice(0, 42), 1800);
+        }
       }
     }, 160);
   }

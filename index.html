@@ -3,14 +3,52 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sumon — Creative Persistent Agent</title>
+  <title>Sam AI — Roaming Companion</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
-  <!-- Full-screen trap jaws overlay -->
+<body class="roam-world">
+  <!-- Atmosphere only — no full-page stages -->
+  <div class="sky" aria-hidden="true">
+    <span class="drift drift-a"></span>
+    <span class="drift drift-b"></span>
+    <span class="drift drift-c"></span>
+  </div>
+
+  <p class="roam-hint" id="roamHint">Sam AI wanders the display — click or drag the character to chat</p>
+
+  <!-- Hidden toys kept for agent commands (ring / snap) -->
+  <div class="offstage" aria-hidden="true">
+    <button id="alarmMan" class="alarm-man" type="button" tabindex="-1">
+      <span class="bell bell-left"></span><span class="bell bell-right"></span>
+      <span class="hammer"></span>
+      <span class="clock-body"><span class="face">
+        <span class="eye eye-left"></span><span class="eye eye-right"></span>
+        <span class="mouth"></span><span class="hand hour"></span><span class="hand minute"></span>
+        <span class="center-dot"></span>
+      </span></span>
+      <span class="arm arm-left"><span class="hand-shape"></span></span>
+      <span class="arm arm-right"><span class="hand-shape"></span></span>
+      <span class="leg leg-left"><span class="foot"></span></span>
+      <span class="leg leg-right"><span class="foot"></span></span>
+    </button>
+    <button id="ringBtn" type="button"></button>
+    <button id="snoozeBtn" type="button"></button>
+    <p id="status"></p>
+
+    <button id="bearTrap" class="bear-trap set" type="button" tabindex="-1">
+      <span class="bt-base"></span><span class="bt-spring"></span><span class="bt-plate"></span>
+      <span class="bt-jaw bt-jaw-left"><span class="bt-tooth"></span><span class="bt-tooth"></span><span class="bt-tooth"></span><span class="bt-tooth"></span><span class="bt-tooth"></span></span>
+      <span class="bt-jaw bt-jaw-right"><span class="bt-tooth"></span><span class="bt-tooth"></span><span class="bt-tooth"></span><span class="bt-tooth"></span><span class="bt-tooth"></span></span>
+      <span class="bt-bait">🧀</span>
+    </button>
+    <button id="snapBtn" type="button"></button>
+    <button id="resetTrapBtn" type="button"></button>
+    <p id="trapStatus"></p>
+  </div>
+
   <div id="screenTrap" class="screen-trap" aria-hidden="true">
     <div class="trap-jaw trap-jaw-top">
       <span class="tooth"></span><span class="tooth"></span><span class="tooth"></span>
@@ -28,123 +66,43 @@
     <p class="trap-gotcha">GOTCHA!</p>
   </div>
 
-  <main class="page">
-    <section class="stage">
-      <header class="header">
-        <h1>Alarm Man</h1>
-        <p>Click him to ring the alarm!</p>
-      </header>
+  <!-- Roaming Sam AI character -->
+  <button id="samRoamer" class="sam-roamer" type="button" aria-label="Sam AI — click to chat, drag to move">
+    <span class="sam-shadow" aria-hidden="true"></span>
+    <span class="sam-body" aria-hidden="true">
+      <span class="agent-aura"></span>
+      <span class="agent-core">
+        <span class="agent-eye agent-eye-left"></span>
+        <span class="agent-eye agent-eye-right"></span>
+        <span class="agent-mouth"></span>
+      </span>
+      <span class="agent-antenna"></span>
+      <span class="sam-leg sam-leg-l"></span>
+      <span class="sam-leg sam-leg-r"></span>
+    </span>
+    <span class="sam-name">Sam AI</span>
+    <span id="samBubble" class="sam-bubble" hidden></span>
+  </button>
 
-      <button id="alarmMan" class="alarm-man" type="button" aria-label="Ring Alarm Man">
-        <span class="bell bell-left" aria-hidden="true"></span>
-        <span class="bell bell-right" aria-hidden="true"></span>
-        <span class="hammer" aria-hidden="true"></span>
-
-        <span class="clock-body" aria-hidden="true">
-          <span class="face">
-            <span class="eye eye-left"></span>
-            <span class="eye eye-right"></span>
-            <span class="mouth"></span>
-            <span class="hand hour"></span>
-            <span class="hand minute"></span>
-            <span class="center-dot"></span>
-          </span>
-        </span>
-
-        <span class="arm arm-left" aria-hidden="true">
-          <span class="hand-shape"></span>
-        </span>
-        <span class="arm arm-right" aria-hidden="true">
-          <span class="hand-shape"></span>
-        </span>
-
-        <span class="leg leg-left" aria-hidden="true">
-          <span class="foot"></span>
-        </span>
-        <span class="leg leg-right" aria-hidden="true">
-          <span class="foot"></span>
-        </span>
-      </button>
-
-      <div class="controls">
-        <button id="ringBtn" class="btn" type="button">Ring!</button>
-        <button id="snoozeBtn" class="btn btn-secondary" type="button">Snooze</button>
-      </div>
-
-      <p id="status" class="status" aria-live="polite">zzz… sleeping</p>
-    </section>
-
-    <section class="stage trap-stage">
-      <header class="header">
-        <h1>Screen Trap</h1>
-        <p>Click the trap — jaws snap shut on the display!</p>
-      </header>
-
-      <button id="bearTrap" class="bear-trap" type="button" aria-label="Spring the trap">
-        <span class="bt-base" aria-hidden="true"></span>
-        <span class="bt-spring" aria-hidden="true"></span>
-        <span class="bt-plate" aria-hidden="true"></span>
-        <span class="bt-jaw bt-jaw-left" aria-hidden="true">
-          <span class="bt-tooth"></span><span class="bt-tooth"></span>
-          <span class="bt-tooth"></span><span class="bt-tooth"></span>
-          <span class="bt-tooth"></span>
-        </span>
-        <span class="bt-jaw bt-jaw-right" aria-hidden="true">
-          <span class="bt-tooth"></span><span class="bt-tooth"></span>
-          <span class="bt-tooth"></span><span class="bt-tooth"></span>
-          <span class="bt-tooth"></span>
-        </span>
-        <span class="bt-bait" aria-hidden="true">🧀</span>
-      </button>
-
-      <div class="controls">
-        <button id="snapBtn" class="btn btn-danger" type="button">SNAP!</button>
-        <button id="resetTrapBtn" class="btn btn-secondary" type="button">Reset</button>
-      </div>
-
-      <p id="trapStatus" class="status" aria-live="polite">Trap is set… waiting…</p>
-    </section>
-
-    <section class="stage agent-stage">
-      <header class="header">
-        <h1>Agent Sumon</h1>
-        <p>Learns your habits and acts — todos, focus, prefs, proactive nudges. Toys stay as extras.</p>
-      </header>
-
-      <button id="agentFigure" class="agent-figure" type="button" aria-label="Open Agent Sumon">
-        <span class="agent-aura" aria-hidden="true"></span>
-        <span class="agent-core" aria-hidden="true">
-          <span class="agent-eye agent-eye-left"></span>
-          <span class="agent-eye agent-eye-right"></span>
-          <span class="agent-mouth"></span>
-        </span>
-        <span class="agent-antenna" aria-hidden="true"></span>
-      </button>
-
-      <ul id="missionBoard" class="mission-board" aria-live="polite"></ul>
-
-      <div class="controls">
-        <button id="openAgentBtn" class="btn" type="button">Chat</button>
-        <button id="clearAgentMemoryBtn" class="btn btn-secondary" type="button">Clear memory</button>
-      </div>
-
-      <p id="agentStatus" class="status" aria-live="polite">Multi-task agent on standby</p>
-    </section>
-  </main>
+  <!-- Keep ids agent code expects -->
+  <button id="agentFigure" class="visually-hidden" type="button" tabindex="-1" aria-hidden="true"></button>
+  <ul id="missionBoard" class="visually-hidden" aria-hidden="true"></ul>
+  <button id="openAgentBtn" class="visually-hidden" type="button" tabindex="-1" aria-hidden="true"></button>
+  <button id="clearAgentMemoryBtn" class="visually-hidden" type="button" tabindex="-1" aria-hidden="true"></button>
+  <p id="agentStatus" class="visually-hidden" aria-live="polite"></p>
 
   <div id="focusHud" class="focus-hud" aria-live="polite"></div>
 
-  <!-- Persistent floating chat (always available) -->
-  <button id="agentLauncher" class="agent-launcher" type="button" aria-label="Open persistent assistant" aria-expanded="false" aria-controls="agentPanel">
+  <button id="agentLauncher" class="agent-launcher" type="button" aria-label="Open Sam AI chat" aria-expanded="false" aria-controls="agentPanel">
     <span class="launcher-orb" aria-hidden="true"></span>
-    <span class="launcher-label">Agent</span>
+    <span class="launcher-label">Chat</span>
   </button>
 
-  <aside id="agentPanel" class="agent-panel" aria-hidden="true" aria-label="Agent Sumon chat">
+  <aside id="agentPanel" class="agent-panel" aria-hidden="true" aria-label="Sam AI chat">
     <header class="agent-panel-header">
       <div>
-        <p class="agent-panel-kicker">Talks · learns · acts</p>
-        <h2>Agent Sumon</h2>
+        <p class="agent-panel-kicker">Roaming companion</p>
+        <h2>Sam AI</h2>
       </div>
       <button id="agentClose" class="agent-close" type="button" aria-label="Close chat">×</button>
     </header>
@@ -158,8 +116,8 @@
       <button type="button" class="agent-chip" data-prompt="help">Help</button>
     </div>
     <form id="agentForm" class="agent-form">
-      <button id="agentMic" class="agent-mic" type="button" aria-label="Speak to agent" aria-pressed="false" title="Hold a conversation — click to talk">Mic</button>
-      <label class="visually-hidden" for="agentInput">Message Agent Sumon</label>
+      <button id="agentMic" class="agent-mic" type="button" aria-label="Speak to Sam AI" aria-pressed="false" title="Click to talk">Mic</button>
+      <label class="visually-hidden" for="agentInput">Message Sam AI</label>
       <input id="agentInput" type="text" autocomplete="off" placeholder="Chat freely · or prefer / act / learn" maxlength="280" />
       <button type="submit" class="btn">Send</button>
     </form>
@@ -167,5 +125,6 @@
 
   <script src="script.js"></script>
   <script src="agent.js"></script>
+  <script src="wander.js"></script>
 </body>
 </html>
