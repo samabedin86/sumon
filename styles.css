@@ -9,6 +9,9 @@
   --limb: #2c3e50;
   --accent: #ffe66d;
   --text: #f8f0ff;
+  --agent: #5eead4;
+  --agent-deep: #0f766e;
+  --panel: rgba(18, 12, 36, 0.94);
 }
 
 * {
@@ -21,22 +24,40 @@ body {
   min-height: 100vh;
   display: grid;
   place-items: center;
-  font-family: "Segoe UI", system-ui, sans-serif;
+  font-family: "Outfit", "Segoe UI", system-ui, sans-serif;
   color: var(--text);
   background:
     radial-gradient(circle at 20% 20%, rgba(255, 230, 109, 0.15), transparent 40%),
     radial-gradient(circle at 80% 80%, rgba(255, 107, 107, 0.2), transparent 45%),
+    radial-gradient(circle at 70% 30%, rgba(94, 234, 212, 0.12), transparent 42%),
     linear-gradient(160deg, var(--bg-top), var(--bg-bottom));
   overflow-x: hidden;
 }
 
+.header h1,
+.agent-panel-header h2 {
+  font-family: "Space Grotesk", "Outfit", sans-serif;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .page {
-  width: min(96vw, 920px);
+  width: min(96vw, 1280px);
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 1.5rem;
-  padding: 1rem 0 2rem;
+  padding: 1rem 0 5rem;
 }
 
 .stage {
@@ -768,4 +789,325 @@ body {
 .screen-trap.closing .trap-jaw-top,
 .screen-trap.closing .trap-jaw-bottom {
   transition-duration: 0.18s;
+}
+
+/* ===== Persistent Agent Sumon ===== */
+.agent-stage {
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+@media (min-width: 860px) {
+  .agent-stage {
+    border-top: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.12);
+    padding-left: 1.5rem;
+  }
+}
+
+.agent-figure {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  margin: 0 auto 1.5rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  outline: none;
+}
+
+.agent-aura {
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(94, 234, 212, 0.35), transparent 70%);
+  animation: agent-breathe 3.2s ease-in-out infinite;
+}
+
+.agent-core {
+  position: absolute;
+  inset: 22%;
+  border-radius: 42% 42% 38% 38%;
+  background: linear-gradient(160deg, #99f6e4, var(--agent) 40%, var(--agent-deep));
+  box-shadow:
+    inset 0 -12px 24px rgba(15, 118, 110, 0.45),
+    0 12px 28px rgba(0, 0, 0, 0.35);
+  display: grid;
+  place-items: center;
+}
+
+.agent-eye {
+  position: absolute;
+  top: 38%;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #0b1f1c;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.35);
+}
+
+.agent-eye-left { left: 28%; }
+.agent-eye-right { right: 28%; }
+
+.agent-mouth {
+  position: absolute;
+  bottom: 28%;
+  width: 28px;
+  height: 10px;
+  border-radius: 0 0 14px 14px;
+  border: 3px solid #0b1f1c;
+  border-top: none;
+}
+
+.agent-antenna {
+  position: absolute;
+  top: 6%;
+  left: 50%;
+  width: 4px;
+  height: 28px;
+  margin-left: -2px;
+  background: linear-gradient(180deg, var(--accent), var(--agent));
+  border-radius: 4px;
+}
+
+.agent-antenna::after {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 16px rgba(255, 230, 109, 0.8);
+  animation: antenna-blink 1.6s ease-in-out infinite;
+}
+
+.agent-figure.listening .agent-aura {
+  animation-duration: 1.4s;
+}
+
+.agent-figure.thinking .agent-core {
+  animation: agent-think 0.55s ease-in-out infinite alternate;
+}
+
+.agent-figure.thinking .agent-mouth {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 3px solid #0b1f1c;
+  bottom: 26%;
+}
+
+@keyframes agent-breathe {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.08); opacity: 1; }
+}
+
+@keyframes antenna-blink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(0.85); }
+}
+
+@keyframes agent-think {
+  from { transform: translateY(0); }
+  to { transform: translateY(-4px); }
+}
+
+.agent-launcher {
+  position: fixed;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.55rem 0.9rem 0.55rem 0.55rem;
+  border: 1px solid rgba(94, 234, 212, 0.45);
+  border-radius: 999px;
+  background: rgba(12, 20, 28, 0.88);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.agent-launcher:hover {
+  transform: translateY(-2px);
+}
+
+.agent-launcher.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(12px);
+}
+
+.launcher-orb {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ccfbf1, var(--agent) 55%, var(--agent-deep));
+  box-shadow: 0 0 14px rgba(94, 234, 212, 0.65);
+  animation: antenna-blink 2s ease-in-out infinite;
+}
+
+.agent-panel {
+  position: fixed;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 45;
+  width: min(92vw, 360px);
+  height: min(70vh, 520px);
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  border: 1px solid rgba(94, 234, 212, 0.35);
+  border-radius: 18px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  transform: translateY(18px) scale(0.96);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.agent-panel.open {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.agent-panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1rem 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.agent-panel-kicker {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--agent);
+  opacity: 0.9;
+  margin-bottom: 0.2rem;
+}
+
+.agent-panel-header h2 {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.agent-close {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.agent-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.9rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.agent-bubble {
+  max-width: 92%;
+  padding: 0.65rem 0.8rem;
+  border-radius: 14px;
+  white-space: pre-wrap;
+  line-height: 1.4;
+  font-size: 0.92rem;
+  animation: bubble-in 0.28s ease;
+}
+
+.agent-bubble.agent {
+  align-self: flex-start;
+  background: rgba(94, 234, 212, 0.12);
+  border: 1px solid rgba(94, 234, 212, 0.28);
+}
+
+.agent-bubble.user {
+  align-self: flex-end;
+  background: rgba(255, 230, 109, 0.14);
+  border: 1px solid rgba(255, 230, 109, 0.3);
+}
+
+@keyframes bubble-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.agent-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0 0.75rem 0.55rem;
+}
+
+.agent-chip {
+  border: 1px solid rgba(94, 234, 212, 0.35);
+  background: rgba(94, 234, 212, 0.1);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.agent-chip:hover {
+  background: rgba(94, 234, 212, 0.22);
+}
+
+.agent-form {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.agent-form input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  padding: 0.65rem 0.75rem;
+  font: inherit;
+}
+
+.agent-form input:focus {
+  outline: 2px solid rgba(94, 234, 212, 0.55);
+  outline-offset: 1px;
+}
+
+.agent-form .btn {
+  flex-shrink: 0;
+}
+
+@media (max-width: 520px) {
+  .agent-panel {
+    right: 0.5rem;
+    left: 0.5rem;
+    width: auto;
+    bottom: 0.5rem;
+    height: min(78vh, 560px);
+  }
 }

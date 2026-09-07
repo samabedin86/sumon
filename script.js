@@ -153,4 +153,14 @@
   status.textContent = "zzz… sleeping";
   bearTrap.classList.add("set");
   trapStatus.textContent = "Trap is set… waiting…";
+
+  // Expose controls for the persistent AI agent
+  window.SumonPage = {
+    startRing,
+    stopRing,
+    springTrap,
+    resetTrap,
+    isRinging: () => ringing,
+    isTrapped: () => trapped,
+  };
 })();
