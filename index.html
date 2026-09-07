@@ -143,7 +143,7 @@
   <aside id="agentPanel" class="agent-panel" aria-hidden="true" aria-label="Agent Sumon chat">
     <header class="agent-panel-header">
       <div>
-        <p class="agent-panel-kicker">Learns & acts</p>
+        <p class="agent-panel-kicker">Talks · learns · acts</p>
         <h2>Agent Sumon</h2>
       </div>
       <button id="agentClose" class="agent-close" type="button" aria-label="Close chat">×</button>
@@ -154,13 +154,13 @@
       <button type="button" class="agent-chip" data-prompt="act">Act</button>
       <button type="button" class="agent-chip" data-prompt="profile">Profile</button>
       <button type="button" class="agent-chip" id="focusChip" data-prompt="focus 25">Focus 25</button>
-      <button type="button" class="agent-chip" data-prompt="todos">Todos</button>
-      <button type="button" class="agent-chip" data-prompt="idea">Idea</button>
+      <button type="button" class="agent-chip" data-prompt="talk on">Talk</button>
       <button type="button" class="agent-chip" data-prompt="help">Help</button>
     </div>
     <form id="agentForm" class="agent-form">
+      <button id="agentMic" class="agent-mic" type="button" aria-label="Speak to agent" aria-pressed="false" title="Hold a conversation — click to talk">Mic</button>
       <label class="visually-hidden" for="agentInput">Message Agent Sumon</label>
-      <input id="agentInput" type="text" autocomplete="off" placeholder="prefer focus 15 · learn I work nights · act" maxlength="280" />
+      <input id="agentInput" type="text" autocomplete="off" placeholder="Chat freely · or prefer / act / learn" maxlength="280" />
       <button type="submit" class="btn">Send</button>
     </form>
   </aside>

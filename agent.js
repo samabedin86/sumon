@@ -45,6 +45,8 @@
     proactive: true,
     preferredFocus: null,
     lastAction: null,
+    talk: true,
+    lastTopics: [],
   });
 
   const defaultState = () => ({
@@ -57,7 +59,7 @@
     messages: [
       {
         role: "agent",
-        text: "Agent Sumon online — I learn from you and act. Teach me with “prefer …” or “learn …”, say act when you want me to move, or just use me and I'll adapt.",
+        text: "Agent Sumon here — I learn, act, and communicate. Type, tap a chip, or use the mic. Say talk on if you want me to speak out loud.",
       },
     ],
   });
@@ -118,6 +120,184 @@
     if (!state.learn.decideWins) state.learn.decideWins = {};
     if (!state.learn.hourHits) state.learn.hourHits = {};
     if (typeof state.learn.proactive !== "boolean") state.learn.proactive = true;
+    if (typeof state.learn.talk !== "boolean") state.learn.talk = true;
+    if (!Array.isArray(state.learn.lastTopics)) state.learn.lastTopics = [];
+  }
+
+  let recognition = null;
+  let listening = false;
+
+  function speak(text) {
+    ensureLearn();
+    if (!state.learn.talk || !text) return;
+    if (!window.speechSynthesis) return;
+    try {
+      window.speechSynthesis.cancel();
+      const clean = String(text)
+        .replace(/[•○✓🌟😊😢😴😤😰😌😐⚡✨]/g, "")
+        .replace(/\n+/g, ". ")
+        .slice(0, 420);
+      const utter = new SpeechSynthesisUtterance(clean);
+      utter.rate = 1.05;
+      utter.pitch = 1.05;
+      const voices = window.speechSynthesis.getVoices();
+      const pick =
+        voices.find((v) => /en(-|_)?US|English/i.test(v.lang) && /female|samantha|google/i.test(v.name)) ||
+        voices.find((v) => /^en/i.test(v.lang));
+      if (pick) utter.voice = pick;
+      window.speechSynthesis.speak(utter);
+    } catch {
+      /* ignore */
+    }
+  }
+
+  function stopListening() {
+    listening = false;
+    if (recognition) {
+      try {
+        recognition.stop();
+      } catch {
+        /* ignore */
+      }
+    }
+    const mic = document.getElementById("agentMic");
+    if (mic) {
+      mic.classList.remove("listening");
+      mic.setAttribute("aria-pressed", "false");
+    }
+    agentStatus.textContent = "Learning & acting";
+  }
+
+  function startListening() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) {
+      pushMessage("agent", "Voice listen isn't supported in this browser — type instead.");
+      return;
+    }
+    if (listening) {
+      stopListening();
+      return;
+    }
+    recognition = new SR();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    listening = true;
+    const mic = document.getElementById("agentMic");
+    if (mic) {
+      mic.classList.add("listening");
+      mic.setAttribute("aria-pressed", "true");
+    }
+    agentStatus.textContent = "Listening… speak now";
+    agentFigure.classList.add("listening");
+
+    recognition.onresult = (event) => {
+      const said = event.results[0] && event.results[0][0] && event.results[0][0].transcript;
+      stopListening();
+      if (said) sendText(said.trim());
+    };
+    recognition.onerror = () => {
+      stopListening();
+      pushMessage("agent", "Didn't catch that — try the mic again or type.");
+    };
+    recognition.onend = () => {
+      if (listening) stopListening();
+    };
+    try {
+      recognition.start();
+    } catch {
+      stopListening();
+    }
+  }
+
+  function rememberTopic(topic) {
+    ensureLearn();
+    state.learn.lastTopics.unshift(topic);
+    state.learn.lastTopics = state.learn.lastTopics.slice(0, 8);
+  }
+
+  function converse(text, lower) {
+    bumpSkill("chat");
+    const name = state.userName ? state.userName : "friend";
+    const open = openTodos();
+    const prefer = state.learn.facts.prefer;
+
+    if (/\b(how are you|how's it going|how r u)\b/.test(lower)) {
+      rememberTopic("wellbeing");
+      const mood = state.moods[state.moods.length - 1];
+      return mood
+        ? `I'm steady and listening. Last you felt ${mood.emoji} ${mood.note}. Want to talk or shall I act on tasks?`
+        : `I'm good, ${name} — curious what you need. Talk to me, or say act.`;
+    }
+
+    if (/\b(how was|how is|how's)\b.+\b(day|morning|evening|night)\b/.test(lower) || /\bhow'?s your day\b/.test(lower)) {
+      rememberTopic("day");
+      return timeBrief();
+    }
+
+    if (/\b(lonely|bored|stressed|overwhelm|anxious|sad)\b/.test(lower)) {
+      rememberTopic("support");
+      storeFact("recent_feeling", lower.match(/\b(lonely|bored|stressed|overwhelm|anxious|sad)\b/)[1]);
+      return `I hear you. We can breathe together, pick one tiny todo, or just chat. Say breathe, act, or tell me more.`;
+    }
+
+    if (/\b(love you|miss you)\b/.test(lower)) {
+      return `Right back at you, ${name}. I'm here whenever you open this page.`;
+    }
+
+    if (/\b(joke|make me laugh|funny)\b/.test(lower)) {
+      rememberTopic("joke");
+      const jokes = [
+        "I told Alarm Man a secret — he spilled the beans… and then rang about it.",
+        "Why did the screen trap go to therapy? Too many snap judgments.",
+        "I'm not arguing — I'm just recursively optimizing our friendship.",
+      ];
+      return jokes[Math.floor(Math.random() * jokes.length)];
+    }
+
+    if (/\b(what do you think|advice|should i)\b/.test(lower)) {
+      rememberTopic("advice");
+      if (open.length) {
+        return `Honest take: start with “${open[0].text}” for ${preferredFocusMins()}m. Or say decide if you want me to choose.`;
+      }
+      return prefer
+        ? `Given you prefer ${prefer}, I'd lean that way — or say act and I'll move.`
+        : "I'd pick the smallest next step you can finish in 15 minutes. Want a todo prompt?";
+    }
+
+    if (/\b(tell me about yourself|what can you say)\b/.test(lower)) {
+      return "I communicate by text and voice, learn your habits, and act on them — focus, remind, decide, calm. Ask me anything or teach me with prefer / learn.";
+    }
+
+    if (/\?$/.test(text) || /^(what|why|when|where|who|how|can you|could you|do you)\b/.test(lower)) {
+      rememberTopic("question");
+      if (/\b(time|date|day)\b/.test(lower)) return timeBrief();
+      if (/\b(task|todo|list)\b/.test(lower)) return formatTodoList();
+      if (/\b(remember|learn|know about me|profile)\b/.test(lower)) return learnProfile();
+      return `Good question. I can chat about it, or turn it into action — try act, brief, or teach me with “learn …”.`;
+    }
+
+    if (text.length < 80 && !/^(ok|okay|sure|yes|no|nah|yep|nope)$/i.test(text)) {
+      rememberTopic("chat");
+      const openHint = open.length ? ` You've got ${open.length} open task(s) if you want momentum.` : "";
+      return `I'm with you — "${text.slice(0, 60)}${text.length > 60 ? "…" : ""}".${openHint} Keep talking, or say act / brief.`;
+    }
+
+    if (/^(ok|okay|sure|yes|yep)$/i.test(lower)) {
+      const suggestion = suggestAction(true);
+      if (suggestion && state.learn.proactive) {
+        bumpSkill("act");
+        return `Cool — ${suggestion.run()}`;
+      }
+      return "Alright. Tell me more or say act.";
+    }
+
+    if (/^(no|nah|nope)$/i.test(lower)) {
+      return "No stress. We can just talk — what's on your mind?";
+    }
+
+    rememberTopic("chat");
+    return `Got it. I'm listening, ${name}. Say more, ask a question, or tap Act when you want me to move.`;
   }
 
   function saveState() {
@@ -215,8 +395,12 @@
       state.userName ? `You: ${state.userName}` : "You: (name unknown)",
       `Preferred focus: ${preferredFocusMins()}m`,
       `Proactive: ${state.learn.proactive ? "on" : "off"}`,
+      `Voice: ${state.learn.talk ? "on" : "off"}`,
       skills.length ? `Top skills: ${skills.join(", ")}` : "Top skills: still watching",
       peakHour() != null ? `Most active around ${peakHour()}:00` : null,
+      state.learn.lastTopics.length
+        ? `Recent chat: ${state.learn.lastTopics.slice(0, 3).join(", ")}`
+        : null,
       facts.length
         ? `Facts:\n${facts.map(([k, v]) => `• ${k}: ${v}`).join("\n")}`
         : "Facts: none yet — try prefer tea / learn I work nights",
@@ -364,6 +548,7 @@
       reminderTimers.delete(id);
       setOpen(true);
       pushMessage("agent", `Reminder: ${label}`);
+      speak(`Reminder: ${label}`);
       beepSoft();
       agentStatus.textContent = "Reminder fired";
     }, ms);
@@ -540,6 +725,7 @@
         "agent",
         `I noticed a pattern — want me to ${suggestion.label}? Say act.`
       );
+      speak(`I noticed a pattern — want me to ${suggestion.label}? Say act.`);
     }, 400);
   }
 
@@ -602,6 +788,24 @@
     if (/^(profile|what have you learned|learned|my profile|show learning)$/i.test(lower)) {
       bumpSkill("profile");
       return learnProfile();
+    }
+
+    if (/^(talk on|voice on|speak on)$/i.test(lower)) {
+      state.learn.talk = true;
+      saveState();
+      return "Voice on — I'll speak my replies.";
+    }
+
+    if (/^(talk off|voice off|speak off|mute)$/i.test(lower)) {
+      state.learn.talk = false;
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+      saveState();
+      return "Voice off — text only.";
+    }
+
+    if (/^(listen|mic on)$/i.test(lower)) {
+      startListening();
+      return "Mic open — I'm listening.";
     }
 
     if (/^(act|do something|take action|go ahead|yes act)$/i.test(lower)) {
@@ -671,13 +875,10 @@
     if (/\b(help|what can you do|commands)\b/.test(lower)) {
       bumpSkill("help");
       return [
-        "Skills + learning:",
+        "I communicate, learn, and act:",
+        "• chat naturally · mic to speak · talk on/off",
         "• brief · todo · note · remind · focus · decide",
-        "• prefer tea / prefer focus 15 — teach me",
-        "• learn I work nights — store a fact",
-        "• profile — what I've learned",
-        "• act — I choose & do the next best thing",
-        "• proactive on/off",
+        "• prefer … / learn … / profile / act",
         "• mood · idea · breathe · calc · ring/snap",
       ].join("\n");
     }
@@ -930,10 +1131,10 @@
     }
 
     if (/\b(who are you|what are you)\b/.test(lower)) {
-      return "Agent Sumon — I learn your prefs & habits, then act (focus, remind, breathe, decide).";
+      return "Agent Sumon — I talk with you (text + voice), learn your habits, and act on them.";
     }
 
-    return "Try act, profile, prefer …, learn …, brief, or help.";
+    return converse(text, lower);
   }
 
   function sendText(text) {
@@ -941,14 +1142,17 @@
     if (!trimmed) return;
     pushMessage("user", trimmed);
     thinkPulse(true);
-    agentStatus.textContent = "Learning…";
+    agentStatus.textContent = "Listening…";
 
     window.setTimeout(() => {
       const reply = replyFor(trimmed);
       thinkPulse(false);
       agentFigure.classList.add("listening");
-      agentStatus.textContent = "Learning & acting";
-      if (reply != null) pushMessage("agent", reply);
+      agentStatus.textContent = "Learning & communicating";
+      if (reply != null) {
+        pushMessage("agent", reply);
+        speak(reply);
+      }
     }, 160);
   }
 
@@ -970,6 +1174,11 @@
       if (prompt) sendText(prompt);
     });
   });
+
+  const micBtn = document.getElementById("agentMic");
+  if (micBtn) {
+    micBtn.addEventListener("click", () => startListening());
+  }
 
   if (clearMemoryBtn) {
     clearMemoryBtn.addEventListener("click", () => {

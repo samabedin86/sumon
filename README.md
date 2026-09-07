@@ -27,9 +27,9 @@ Visit http://localhost:8000
 | `learn I work nights` | Store a habit/fact |
 | `profile` | Show what it has learned |
 | `act` | Agent picks & runs the next best action |
-| `proactive on/off` | Toggle auto-suggestions |
-| `decide tea or coffee` | Chooses — biased by learned prefs |
-| `mood happy` / `idea` / `breathe` | Check-in, spark, calm |
+| `talk on` / `talk off` | Speak replies out loud |
+| **Mic** button | Voice in — agent listens and replies |
+| Free chat | Natural conversation (questions, feelings, jokes) |
 
 The agent tracks skill usage, focus habits, decision wins, and facts in `localStorage`, then **acts** (start focus, remind, breathe) from those patterns.
 
