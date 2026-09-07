@@ -1052,6 +1052,29 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
+.agent-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0 0.75rem 0.55rem;
+}
+
+.agent-chip {
+  border: 1px solid rgba(94, 234, 212, 0.35);
+  background: rgba(94, 234, 212, 0.1);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.agent-chip:hover {
+  background: rgba(94, 234, 212, 0.22);
+}
+
 .agent-form {
   display: flex;
   gap: 0.5rem;

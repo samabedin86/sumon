@@ -17,7 +17,7 @@
     messages: [
       {
         role: "agent",
-        text: "Hey — I'm Agent Sumon, your persistent assistant. I stick around even after you refresh. Ask me to ring the alarm, spring the trap, or just chat.",
+        text: "Agent Sumon here. I stick around after refresh. Try Ring, Snap, or say your name.",
       },
     ],
   });
@@ -61,10 +61,10 @@
     if (open) {
       input.focus();
       agentFigure.classList.add("listening");
-      agentStatus.textContent = "Online — listening";
+      agentStatus.textContent = "Online";
     } else {
       agentFigure.classList.remove("listening", "thinking");
-      agentStatus.textContent = "Persistent agent on standby";
+      agentStatus.textContent = "On standby";
     }
   }
 
@@ -105,113 +105,88 @@
     if (nameMatch) {
       state.userName = nameMatch[1].replace(/^./, (c) => c.toUpperCase());
       saveState();
-      return `Got it — I'll remember you as ${state.userName}. Refresh anytime; I'll still know.`;
+      return `Saved — hi ${state.userName}.`;
     }
 
     if (/\b(who am i|what'?s my name|do you remember me)\b/.test(lower)) {
-      return name
-        ? `You're ${name}. Persistent memory is working.`
-        : "I don't have your name yet. Tell me: “My name is …”";
+      return name ? `You're ${name}.` : "No name yet. Say “my name is …”";
     }
 
     if (/\b(help|what can you do|commands)\b/.test(lower)) {
-      return [
-        "I replace hunting for buttons. Try:",
-        "• ring / wake up — start Alarm Man",
-        "• snooze / quiet — stop the alarm",
-        "• snap / trap — spring the screen trap",
-        "• reset / release — open the trap",
-        "• status — what's ringing or trapped",
-        "• my name is … — I'll remember across reloads",
-        "• clear memory — wipe chat + name",
-      ].join("\n");
+      return "ring · snooze · snap · reset · status · my name is … · clear memory";
     }
 
     if (/\b(clear memory|forget me|reset memory|wipe)\b/.test(lower)) {
       state = defaultState();
       saveState();
       renderMessages();
-      pushMessage(
-        "agent",
-        "Memory cleared. Fresh start — I'm still your persistent assistant."
-      );
+      pushMessage("agent", "Memory cleared.");
       return null;
     }
 
     if (/\b(status|what'?s happening|state)\b/.test(lower)) {
       const ringing = api.isRinging ? api.isRinging() : false;
       const trapped = api.isTrapped ? api.isTrapped() : false;
-      return `Alarm: ${ringing ? "RINGING" : "sleeping"}. Trap: ${
-        trapped ? "CLOSED" : "set and waiting"
-      }.${name ? ` Hello again, ${name}.` : ""}`;
+      const who = name ? ` · ${name}` : "";
+      return `Alarm ${ringing ? "ON" : "off"} · Trap ${trapped ? "CLOSED" : "set"}${who}`;
     }
 
     if (/\b(ring|alarm|wake|brring|wake up)\b/.test(lower)) {
       if (api.startRing) api.startRing();
-      return name
-        ? `On it, ${name} — Alarm Man is ringing!`
-        : "Alarm Man is ringing. BRRRING!";
+      return name ? `Ringing, ${name}.` : "Ringing.";
     }
 
     if (/\b(snooze|stop|quiet|silence|shut up)\b/.test(lower)) {
       if (api.stopRing) api.stopRing();
-      return "Snoozed. Back to zzz…";
+      return "Snoozed.";
     }
 
     if (/\b(snap|trap|catch|gotcha|spring)\b/.test(lower)) {
       if (api.springTrap) api.springTrap();
-      return "SNAP! Screen trap sprung. Say “reset” when you want out.";
+      return "SNAP!";
     }
 
     if (/\b(reset|release|open|untrap|free)\b/.test(lower)) {
       if (api.resetTrap) api.resetTrap();
-      return "Trap reset. Jaws open again.";
+      return "Trap open.";
     }
 
     if (/\b(hello|hi|hey|yo)\b/.test(lower)) {
-      return name
-        ? `Hey ${name}! I'm still here — persistent and ready.`
-        : "Hey! I'm Agent Sumon, your always-on assistant. What should we do?";
+      return name ? `Hey ${name}.` : "Hey — what's up?";
     }
 
     if (/\b(thank|thanks|ty)\b/.test(lower)) {
-      return "Anytime. That's what a persistent agent is for.";
+      return "Anytime.";
     }
 
     if (/\b(who are you|what are you)\b/.test(lower)) {
-      return "I'm Agent Sumon — a persistent page assistant. I replace hunting through UI; just tell me what you want. I keep chat + your name in local storage.";
+      return "Agent Sumon — persistent page assistant.";
     }
 
-    return name
-      ? `${name}, I'm not sure about that yet. Say “help” for commands, or ask me to ring / snap / reset.`
-      : 'Not sure I caught that. Say “help”, or try “ring the alarm” / “snap the trap”.';
+    return "Say help, or tap Ring / Snap.";
+  }
+
+  function sendText(text) {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    pushMessage("user", trimmed);
+    thinkPulse(true);
+    agentStatus.textContent = "…";
+
+    window.setTimeout(() => {
+      const reply = replyFor(trimmed);
+      thinkPulse(false);
+      agentFigure.classList.add("listening");
+      agentStatus.textContent = "Online";
+      if (reply != null) pushMessage("agent", reply);
+    }, 180);
   }
 
   function handleSubmit(event) {
     event.preventDefault();
-    const text = input.value.trim();
-    if (!text) return;
+    const text = input.value;
     input.value = "";
-    pushMessage("user", text);
-    thinkPulse(true);
-    agentStatus.textContent = "Thinking…";
-
-    window.setTimeout(() => {
-      const reply = replyFor(text);
-      thinkPulse(false);
-      agentFigure.classList.add("listening");
-      agentStatus.textContent = "Online — listening";
-      // If memory was cleared, welcome already rendered; still add reply
-      if (
-        state.messages.length === 1 &&
-        state.messages[0].role === "agent" &&
-        /\b(clear memory|forget me|reset memory|wipe)\b/i.test(text)
-      ) {
-        pushMessage("agent", reply);
-      } else {
-        pushMessage("agent", reply);
-      }
-    }, 280 + Math.min(420, text.length * 8));
+    sendText(text);
   }
 
   launcher.addEventListener("click", () => setOpen(true));
@@ -219,17 +194,21 @@
   closeBtn.addEventListener("click", () => setOpen(false));
   form.addEventListener("submit", handleSubmit);
 
+  document.querySelectorAll(".agent-chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      const prompt = chip.getAttribute("data-prompt");
+      if (prompt) sendText(prompt);
+    });
+  });
+
   if (clearMemoryBtn) {
     clearMemoryBtn.addEventListener("click", () => {
       state = defaultState();
       saveState();
       renderMessages();
-      agentStatus.textContent = "Memory cleared — still online";
+      agentStatus.textContent = "Memory cleared";
       setOpen(true);
-      pushMessage(
-        "agent",
-        "Wiped. I'm still your persistent assistant — just starting fresh."
-      );
+      pushMessage("agent", "Fresh start.");
     });
   }
 
@@ -238,5 +217,5 @@
   renderMessages();
   agentStatus.textContent = state.userName
     ? `Welcome back, ${state.userName}`
-    : "Persistent agent on standby";
+    : "On standby";
 })();
