@@ -18,19 +18,20 @@ Visit http://localhost:8000
 
 | Say / tap | What it does |
 |-----------|----------------|
-| `brief` | Time, greeting, open tasks, mood |
+| `brief` | Day snapshot + learned insights |
 | `todo buy milk` | Add a task (persists) |
-| `todos` / `done 1` | List or complete tasks |
 | `note call mom` | Save a note |
 | `remind stretch in 5m` | Timed nudge |
-| `focus 25` | Focus / pomodoro timer + HUD |
-| `decide tea or coffee` / `coin` | Quick decisions |
-| `calc 12*8` | Math |
-| `mood happy` | Mood check-in |
-| `idea` / `breathe` | Spark or calm |
-| `ring` / `snap` | Still controls the play toys |
+| `focus` / `focus 25` | Focus timer (learns your usual length) |
+| `prefer tea` / `prefer focus 15` | Teach a preference |
+| `learn I work nights` | Store a habit/fact |
+| `profile` | Show what it has learned |
+| `act` | Agent picks & runs the next best action |
+| `proactive on/off` | Toggle auto-suggestions |
+| `decide tea or coffee` | Chooses — biased by learned prefs |
+| `mood happy` / `idea` / `breathe` | Check-in, spark, calm |
 
-Chat, todos, notes, moods, and focus state survive reloads via `localStorage`.
+The agent tracks skill usage, focus habits, decision wins, and facts in `localStorage`, then **acts** (start focus, remind, breathe) from those patterns.
 
 ## Toy controls
 

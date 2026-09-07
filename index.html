@@ -108,7 +108,7 @@
     <section class="stage agent-stage">
       <header class="header">
         <h1>Agent Sumon</h1>
-        <p>Creative persistent assistant — todos, notes, focus, reminders, decisions. Play toys stay as extras.</p>
+        <p>Learns your habits and acts — todos, focus, prefs, proactive nudges. Toys stay as extras.</p>
       </header>
 
       <button id="agentFigure" class="agent-figure" type="button" aria-label="Open Agent Sumon">
@@ -143,7 +143,7 @@
   <aside id="agentPanel" class="agent-panel" aria-hidden="true" aria-label="Agent Sumon chat">
     <header class="agent-panel-header">
       <div>
-        <p class="agent-panel-kicker">Creative assistant</p>
+        <p class="agent-panel-kicker">Learns & acts</p>
         <h2>Agent Sumon</h2>
       </div>
       <button id="agentClose" class="agent-close" type="button" aria-label="Close chat">×</button>
@@ -151,16 +151,16 @@
     <div id="agentMessages" class="agent-messages" role="log" aria-live="polite"></div>
     <div class="agent-chips" role="group" aria-label="Quick actions">
       <button type="button" class="agent-chip" data-prompt="brief">Brief</button>
+      <button type="button" class="agent-chip" data-prompt="act">Act</button>
+      <button type="button" class="agent-chip" data-prompt="profile">Profile</button>
+      <button type="button" class="agent-chip" id="focusChip" data-prompt="focus 25">Focus 25</button>
       <button type="button" class="agent-chip" data-prompt="todos">Todos</button>
-      <button type="button" class="agent-chip" data-prompt="focus 25">Focus</button>
       <button type="button" class="agent-chip" data-prompt="idea">Idea</button>
-      <button type="button" class="agent-chip" data-prompt="coin">Coin</button>
-      <button type="button" class="agent-chip" data-prompt="breathe">Breathe</button>
       <button type="button" class="agent-chip" data-prompt="help">Help</button>
     </div>
     <form id="agentForm" class="agent-form">
       <label class="visually-hidden" for="agentInput">Message Agent Sumon</label>
-      <input id="agentInput" type="text" autocomplete="off" placeholder="todo buy milk · remind stretch in 5m" maxlength="280" />
+      <input id="agentInput" type="text" autocomplete="off" placeholder="prefer focus 15 · learn I work nights · act" maxlength="280" />
       <button type="submit" class="btn">Send</button>
     </form>
   </aside>
